@@ -1,0 +1,81 @@
+<header class="topbar">
+  <h1>NimbusDesk</h1>
+  <div class="session">
+    <span>{{ currentEmail }}</span>
+    <button type="button" (click)="logout()">Sign out</button>
+  </div>
+</header>
+
+<main class="dashboard">
+  <section class="card">
+    <h2>Check a room</h2>
+    <label>
+      Room
+      <select [(ngModel)]="roomId" name="roomId">
+        @for (room of rooms; track room.id) {
+          <option [value]="room.id">{{ room.name }} — {{ room.capacity }} seats — ${{ room.pricePerHour }}/h</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Start
+      <input type="datetime-local" [(ngModel)]="startTime" name="startTime" />
+    </label>
+
+    <label>
+      End
+      <input type="datetime-local" [(ngModel)]="endTime" name="endTime" />
+    </label>
+
+    <div class="actions">
+      <button type="button" (click)="checkAvailability()" [disabled]="loading()">Check availability</button>
+      <button type="button" class="primary" (click)="createBooking()" [disabled]="loading()">Book it</button>
+    </div>
+
+    @if (availability() !== null) {
+      <p class="result" [class.ok]="availability()" [class.blocked]="!availability()">
+        {{ availability() ? 'Available' : 'Not available' }} — {{ roomName(roomId) }}
+      </p>
+    }
+  </section>
+
+  <section class="card">
+    <h2>Look up a booking</h2>
+    <label>
+      Booking id
+      <input type="number" [(ngModel)]="lookupId" name="lookupId" />
+    </label>
+    <div class="actions">
+      <button type="button" (click)="lookupBooking()" [disabled]="loading()">Look up</button>
+    </div>
+  </section>
+
+  @if (errorMessage()) {
+    <p class="error">{{ errorMessage() }}</p>
+  }
+
+  @if (booking(); as current) {
+    <section class="card booking-details">
+      <h2>Booking #{{ current.id }}</h2>
+      <dl>
+        <dt>Room</dt>
+        <dd>{{ roomName(current.roomId) }}</dd>
+        <dt>Requested by</dt>
+        <dd>{{ current.requestedBy }}</dd>
+        <dt>From</dt>
+        <dd>{{ current.startTime }}</dd>
+        <dt>To</dt>
+        <dd>{{ current.endTime }}</dd>
+        <dt>Total price</dt>
+        <dd>${{ current.totalPrice }}</dd>
+        <dt>Status</dt>
+        <dd class="status" [class.cancelled]="current.status === 'CANCELLED'">{{ current.status }}</dd>
+      </dl>
+
+      @if (current.status === 'CONFIRMED') {
+        <button type="button" class="danger" (click)="cancelCurrentBooking()" [disabled]="loading()">Cancel booking</button>
+      }
+    </section>
+  }
+</main>
