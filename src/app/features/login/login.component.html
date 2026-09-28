@@ -1,0 +1,28 @@
+<div class="auth-card">
+  <h1>NimbusDesk</h1>
+  <p class="subtitle">{{ mode === 'login' ? 'Sign in to book a space' : 'Create an account' }}</p>
+
+  <form (ngSubmit)="submit()">
+    <label>
+      Email
+      <input type="email" name="email" [(ngModel)]="email" required autocomplete="email" />
+    </label>
+
+    <label>
+      Password
+      <input type="password" name="password" [(ngModel)]="password" required minlength="8" autocomplete="current-password" />
+    </label>
+
+    @if (errorMessage()) {
+      <p class="error">{{ errorMessage() }}</p>
+    }
+
+    <button type="submit" [disabled]="submitting()">
+      {{ submitting() ? 'Please wait…' : (mode === 'login' ? 'Sign in' : 'Create account') }}
+    </button>
+  </form>
+
+  <button type="button" class="link" (click)="toggleMode()">
+    {{ mode === 'login' ? "Don't have an account? Register" : 'Already have an account? Sign in' }}
+  </button>
+</div>
